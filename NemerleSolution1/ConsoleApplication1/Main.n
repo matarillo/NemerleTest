@@ -1,0 +1,37 @@
+﻿using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+using Nemerle.Xml;
+
+using System;
+using System.Collections.Generic;
+using System.Console;
+using System.Diagnostics;
+using System.Linq;
+using System.Xml.Linq;
+
+module Program
+{
+  Main() : void
+  {
+    def title = "Programming language authors";
+    def authors = ["Anders Hejlsberg", "Simon Peyton-Jones"];
+    
+    def html = xml <#
+  <html>
+    <head>
+      <title>$title</title>
+    </head>
+    <body>
+      <ul $when(authors.Any())>
+        <li $foreach(author in authors)>$author</li>
+      </ul>
+    </body>
+  </html>
+#>;
+
+    WriteLine(html.GetType());
+    WriteLine(html);
+    _ = ReadLine();
+  }
+}
