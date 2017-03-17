@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using System.Reflection;
+using System.Collections.Generic;
 
 namespace ConsoleProgram1
 {
@@ -49,9 +50,32 @@ namespace ConsoleProgram1
                 Console.WriteLine("not found");
                 return;
             }
+
+            var methods = GetMethods(info).ToArray();
+            foreach (var m in methods)
+            {
+                Console.WriteLine(m);
+            }
+        }
+
+        public static IEnumerable<MethodInfo> GetMethods(MethodTipInfo info)
+        {
             for (var i = 0; i < info.GetCount(); i++)
             {
-                Console.WriteLine(info.GetName(i));
+                var name = info.GetName(i);
+                var type = info.GetType(i);
+                var description = info.GetDescription(i);
+                var param = GetParameters(info, i);
+                yield return new MethodInfo { Name = name, Type = type, Description = description, Parameters = param.ToArray() };
+            }
+        }
+
+        public static IEnumerable<Info> GetParameters(MethodTipInfo info, int index)
+        {
+            for (var i = 0; i < info.GetParameterCount(index); i++)
+            {
+                var t = info.GetParameterInfo(index, i);
+                yield return new Info { Name = t.Field0, Type = t.Field1, Description = t.Field2 };
             }
         }
 
@@ -84,6 +108,26 @@ namespace ConsoleProgram1
                 }
             }
             throw new Exception("Tag not found.");
+        }
+    }
+
+    public class Info
+    {
+        public string Name { get; set; }
+        public string Type { get; set; }
+        public string Description { get; set; }
+        public override string ToString()
+        {
+            return "Name=" + Name + ", Type=" + Type + ", Description=" + Description;
+        }
+    }
+    public class MethodInfo : Info
+    {
+        public Info[] Parameters { get; set; }
+        public override string ToString()
+        {
+            var parameters = string.Join("", Parameters.Select((x, i) => ", Parameters[" + i + "]={" + x.ToString() + "}"));
+            return "Name=" + Name + ", Type=" + Type + ", Description=" + Description + parameters;
         }
     }
 }
